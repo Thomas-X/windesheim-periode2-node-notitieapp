@@ -1,0 +1,18 @@
+extends layout.pug
+
+block content
+    div.container
+        div.jumbotron
+            h1 Add a note
+            p Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi aperiam debitis dolore doloremque ducimus iusto mollitia obcaecati, recusandae. Accusamus aperiam culpa esse expedita in iusto nisi pariatur sapiente, sed ut.
+
+        br
+
+        div
+            form(method="post" action="/notes/create")
+                label Note name
+                input(name="name" class="form-control")
+                label Note content
+                input(name="content" class="form-control")
+                br
+                button(class="btn btn-success" type="submit") submit

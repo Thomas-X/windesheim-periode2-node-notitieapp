@@ -1,0 +1,12 @@
+extends layout.pug
+
+block content
+    div.container
+        div.jumbotron
+            h1 Notitiesapp
+            p Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi aperiam debitis dolore doloremque ducimus iusto mollitia obcaecati, recusandae. Accusamus aperiam culpa esse expedita in iusto nisi pariatur sapiente, sed ut.
+
+        ul(class="list-group")
+            each file in files
+                li Go to:&emsp;
+                    a(href="/notes/" + file)=file

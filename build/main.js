@@ -97,14 +97,52 @@ module.exports =
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var express__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! express */ "express");
+/* WEBPACK VAR INJECTION */(function(__dirname) {/* harmony import */ var express__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! express */ "express");
 /* harmony import */ var express__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(express__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var fs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! fs */ "fs");
+/* harmony import */ var fs__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(fs__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! path */ "path");
+/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(path__WEBPACK_IMPORTED_MODULE_2__);
+
+
 
 const Home = Object(express__WEBPACK_IMPORTED_MODULE_0__["Router"])();
+const notesFolderPath = path__WEBPACK_IMPORTED_MODULE_2___default.a.join(__dirname, '../../', 'notes');
+
+const html_template = content => `
+<div>
+<h1>${content}</h1>
+
+</div>
+
+<a href="/">Go to home</a>
+`;
+
 Home.get('/', (req, res) => {
-  res.send('hi from home');
+  let files = fs__WEBPACK_IMPORTED_MODULE_1___default.a.readdirSync(notesFolderPath);
+  files = files.map((val, idx) => val.split('.html')[0]);
+  res.render('home', {
+    title: 'Home',
+    files
+  });
+});
+Home.get('/notes/create', (req, res) => {
+  res.render('notes_create', {
+    title: 'Create note'
+  });
+});
+Home.get('/notes/:name', (req, res) => {
+  console.log(notesFolderPath);
+  console.log(path__WEBPACK_IMPORTED_MODULE_2___default.a.join(notesFolderPath, req.params.name + '.html'));
+  const note = fs__WEBPACK_IMPORTED_MODULE_1___default.a.readFileSync(path__WEBPACK_IMPORTED_MODULE_2___default.a.join(notesFolderPath, req.params.name + '.html'), 'utf8');
+  res.send(note);
+});
+Home.post('/notes/create', (req, res) => {
+  fs__WEBPACK_IMPORTED_MODULE_1___default.a.appendFileSync(path__WEBPACK_IMPORTED_MODULE_2___default.a.join(notesFolderPath, req.body.name + '.html'), html_template(req.body.content));
+  res.redirect('/');
 });
 /* harmony default export */ __webpack_exports__["default"] = (Home);
+/* WEBPACK VAR INJECTION */}.call(this, "src/controllers"))
 
 /***/ }),
 
@@ -163,7 +201,11 @@ class Server {
     });
 
     _defineProperty(this, "start", async () => {
-      this.app.use(body_parser__WEBPACK_IMPORTED_MODULE_0___default.a.json());
+      this.app.use(body_parser__WEBPACK_IMPORTED_MODULE_0___default()({
+        urlencoded: true
+      }));
+      this.app.use(express__WEBPACK_IMPORTED_MODULE_2___default.a.static('public'));
+      this.app.set('view engine', 'pug');
       this.setRoutes();
       const http = new http__WEBPACK_IMPORTED_MODULE_3__["Server"](this.app);
       http.listen(this.port, this.onListen);
@@ -303,6 +345,17 @@ module.exports = require("express");
 
 /***/ }),
 
+/***/ "fs":
+/*!*********************!*\
+  !*** external "fs" ***!
+  \*********************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("fs");
+
+/***/ }),
+
 /***/ "http":
 /*!***********************!*\
   !*** external "http" ***!
@@ -322,6 +375,17 @@ module.exports = require("http");
 /***/ (function(module, exports) {
 
 module.exports = require("ip");
+
+/***/ }),
+
+/***/ "path":
+/*!***********************!*\
+  !*** external "path" ***!
+  \***********************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("path");
 
 /***/ }),
 
