@@ -1,35 +1,49 @@
-// load .env file into process.env global
-require('dotenv').config();
-import getServerData from './getServerData';
+import bodyParser from 'body-parser';
+import chalk from 'chalk';
 import express from 'express';
-import {ApolloServer, gql} from 'apollo-server-express';
+import { Server as HttpServer } from 'http';
+import ip from 'ip';
+import { error, info, warn } from './services/log';
+import Home from "./controllers/home";
 
-// init lowdb singleton
-import db from './connector/DB';
+require('dotenv').config();
 
-db.defaults({
-	persons: [],
-	count: 0
-})
-	.write();
+class Server {
+    app;
+    port;
 
-const {resolvers, schema} = getServerData();
-const server = new ApolloServer({typeDefs: schema, resolvers});
+    constructor () {
 
-const app = express();
+        this.app = express();
+        this.port = process.env.PORT || 3000;
+        this.start();
+    }
 
-// { type: 'Query', query: '{}{}DAS{D{A}' }
-// /graphql
-// dds
-// /persons/getNamesFromPersons
+    onListen = (err) => {
+        if (err) {
+            error(`Unable to start server on port ${this.port}`, err);
+            return;
+        }
 
-app.get('/world', (req,res) => res.send('hi!!'));
+        if (process.env.__DEV__) {
+            warn('We\'re in development mode.');
+        }
 
-server.applyMiddleware({app});
+        info(`We're live.\r\n`);
+        info(chalk`{bold On your network:}     {underline http://${ip.address('public')}:{bold ${this.port.toString()}}/}`);
+        info(chalk`Local:               {underline http://${ip.address('private')}:{bold ${this.port.toString()}}/}`);
+    };
 
-const port = 4000;
+    start = async () => {
+        this.app.use(bodyParser.json());
+        this.setRoutes();
+        const http = new HttpServer(this.app);
+        http.listen(this.port, this.onListen);
+    };
 
-app.listen({port}, () => {
-		console.log(`🚀 Server ready at http://localhost:${port}${server.graphqlPath}`)
-	}
-);
+    setRoutes = () => {
+        this.app.use('/', Home);
+    };
+}
+
+export default new Server();
