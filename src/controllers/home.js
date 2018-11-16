@@ -1,6 +1,7 @@
 import {Router} from 'express';
 import fs from 'fs';
 import path from 'path';
+import sanitize_filename from 'sanitize-filename';
 
 
 const Home = Router();
@@ -32,7 +33,7 @@ Home.get('/notes/:name', (req, res) => {
 });
 
 Home.post('/notes/create', (req, res) => {
-	fs.appendFileSync(path.join(notesFolderPath, req.body.name + '.html'), html_template(req.body.content));
+	fs.appendFileSync(path.join(notesFolderPath, sanitize_filename(req.body.name)+ '.html'), html_template(req.body.content));
 	res.redirect('/');
 });
 
